@@ -181,6 +181,10 @@ class ContactController extends Controller
             ];
             return response()->json($data, $data['code']);
         }
+
+        $contact->phones()->delete();
+        $contact->emails()->delete();
+        $contact->addresses()->delete();
         
         if ($contact->delete()) {
             $data = [
