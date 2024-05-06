@@ -3,62 +3,127 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Email;
+use Illuminate\Support\Facades\Validator;
 
-class EmailController extends Controller
+class emailController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        // Validar datos
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email',
+            'contact_id' => 'required|exists:contacts,id'
+        ]);
+
+        // Verificar si hay errores
+        if ($validator->fails()) {
+            $data = [
+                "status" => "error",
+                "code" => 422,
+                'errors' => $validator->errors()
+            ];
+            return response()->json($data, $data['code']);
+        }
+
+        // Crear email
+        $email = new Email();
+        $email->email = $request->email;
+        $email->contact_id = $request->contact_id;
+        if($email->save()){
+            $data = [
+                'status' => 'success',
+                'code' => 201,
+                'message' => 'email creado exitosamente',
+                'email' => $email
+            ];
+        }else {
+            $data = [
+                'status' => 'error',
+                'code' => 500,
+                'message' => 'Ocurrió un error'                
+            ];  
+        }                    
+        return response()->json($data, $data['code']);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        // Validar datos
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email',
+            'contact_id' => 'required|exists:contacts,id'
+        ]);
+
+        // Verificar si hay errores
+        if ($validator->fails()) {
+            $data = [
+                "status" => "error",
+                "code" => 422,
+                'errors' => $validator->errors()
+            ];
+            return response()->json($data, $data['code']);
+        }
+
+        // Buscar email
+        $email = Email::find($id);
+        if (!$email) {
+            $data = [
+                'status' => 'error',
+                'code' => 404,
+                'message' => 'email no encontrado'
+            ];
+            return response()->json($data, $data['code']);
+        }
+
+        $email->email = $request->email;
+        $email->contact_id = $request->contact_id;
+
+        if ($email->save()) {
+            $data = [
+                'status' => 'success',
+                'code' => 200,
+                'message' => 'email actualizado exitosamente',
+                'email' => $email
+            ];
+        } else {
+            $data = [
+                'status' => 'error',
+                'code' => 500,
+                'message' => 'Ocurrió un error al actualizar el email'
+            ];
+        }
+
+        return response()->json($data, $data['code']);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy($id)
     {
-        //
-    }
+        // Buscar hpone
+        $email = Email::find($id);
+        if (!$email) {
+            $data = [
+                'status' => 'error',
+                'code' => 404,
+                'message' => 'email no encontrado'
+            ];
+            return response()->json($data, $data['code']);
+        }
+        
+        if ($email->delete()) {
+            $data = [
+                'status' => 'success',
+                'code' => 200,
+                'message' => 'email eliminado exitosamente'
+            ];
+        } else {
+            $data = [
+                'status' => 'error',
+                'code' => 500,
+                'message' => 'Ocurrió un error al eliminar el email'
+            ];
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json($data, $data['code']);
     }
 }

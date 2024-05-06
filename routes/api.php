@@ -3,6 +3,9 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\PhoneController;
+use App\Http\Controllers\EmailController;
+use App\Http\Controllers\AddressController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +28,15 @@ Route::resource('/contact', ContactController::class, [
 ]);
 
 Route::get('/search/{searchTerm}', [ContactController::class, 'search']);
+
+Route::resource('/phone', PhoneController::class, [
+    'only' => ['store','update','destroy']
+]);
+
+Route::resource('/email', EmailController::class, [
+    'only' => ['store','update','destroy']
+]);
+
+Route::resource('/address', AddressController::class, [
+    'only' => ['store','update','destroy']
+]);
