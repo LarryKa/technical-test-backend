@@ -66,6 +66,7 @@ class ContactController extends Controller
     {
         // Buscar el contacto 
         $contact = Contact::find($id);
+        $contact->load(['phones', 'emails', 'addresses']);
         // Verificar si el contacto existe
         if (!$contact) {
             $data = [
@@ -73,14 +74,14 @@ class ContactController extends Controller
                 'code' => 404,
                 'message' => 'Contacto no encontrado'
             ];
-            return response()->json([$data], $data['code']);
+            return response()->json($data, $data['code']);
         }
         $data = [
             'status' => 'success',
             'code' => 200,            
             'contact' => $contact
         ];
-        return response()->json([$data], $data['code']);
+        return response()->json($data, $data['code']);
     }
 
     public function update(Request $request, $id)
@@ -95,7 +96,7 @@ class ContactController extends Controller
                 'code' => 404,
                 'message' => 'Contacto no encontrado'
             ];
-            return response()->json([$data], $data['code']);
+            return response()->json($data, $data['code']);
         }
 
         // Validar datos
@@ -147,7 +148,7 @@ class ContactController extends Controller
                 'code' => 404,
                 'message' => 'Contacto no encontrado'
             ];
-            return response()->json([$data], $data['code']);
+            return response()->json($data, $data['code']);
         }
         
         if ($contact->delete()) {
