@@ -9,4 +9,9 @@ class Address extends Model
 {
     use HasFactory;
     protected $table = 'addresses';
+
+    public function contact()
+    {
+        return $this->belongsTo(Contact::class);
+    }
 }
