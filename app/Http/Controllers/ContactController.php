@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Contact;
+use App\Models\Phone;
+use App\Models\Email;
+use App\Models\Address;
 use Illuminate\Support\Facades\Validator;
 
 class ContactController extends Controller
@@ -28,6 +31,12 @@ class ContactController extends Controller
             'name' => 'required|string',
             'surname' => 'required|string',
             'city' => 'required|string',
+            'emails' => 'required|array',
+            'emails.*' => 'required|email',
+            'addresses' => 'required|array',
+            'addresses.*' => 'required|string',
+            'phones' => 'required|array',
+            'phones.*' => 'required|regex:/^\d{10}$/'
         ]);
 
         // Verificar si hay errrores
@@ -46,6 +55,28 @@ class ContactController extends Controller
         $contact->surname = $request->surname;
         $contact->city = $request->city;
         if($contact->save()){
+
+            foreach ($request->emails as $email) {
+                $newEmail = new Email();
+                $newEmail->email = $email;
+                $newEmail->contact_id = $contact->id;
+                $newEmail->save();
+            }
+                    
+            foreach ($request->addresses as $address) {
+                $newAddress = new Address();
+                $newAddress->address = $address;
+                $newAddress->contact_id = $contact->id;
+                $newAddress->save();
+            }
+                    
+            foreach ($request->phones as $phone) {
+                $newPhone = new Phone();
+                $newPhone->phone = $phone;
+                $newPhone->contact_id = $contact->id;
+                $newPhone->save();
+            }
+
             $data = [
                 'status' => 'success',
                 'code' => 200,
@@ -59,7 +90,7 @@ class ContactController extends Controller
                 'message' => 'Ocurrió un error'                
             ];  
         }                    
-        return response()->json([$data], $data['code']);        
+        return response()->json($data, $data['code']);        
     }
 
     public function show(string $id)
@@ -135,7 +166,7 @@ class ContactController extends Controller
             ];
         }
 
-        return response()->json([$data], $data['code']);
+        return response()->json($data, $data['code']);
     }
 
     public function destroy($id)
@@ -165,7 +196,7 @@ class ContactController extends Controller
             ];
         }
 
-        return response()->json([$data], $data['code']);
+        return response()->json($data, $data['code']);
     }
 
 
@@ -178,6 +209,7 @@ class ContactController extends Controller
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', "%$searchTerm%")
                     ->orWhere('surname', 'like', "%$searchTerm%")
+                    ->orWhere('city', 'like', "%$searchTerm%")
                     ->orWhereHas('phones', function ($q) use ($searchTerm) {
                         $q->where('phone', 'like', "%$searchTerm%");
                     })
