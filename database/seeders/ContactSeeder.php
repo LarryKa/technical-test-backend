@@ -21,6 +21,7 @@ class ContactSeeder extends Seeder
             $contact = Contact::create([
                 'name' => $faker->firstName,
                 'surname' => $faker->lastName,
+                'city' => $faker->city
             ]);
 
             // Crear número de telefono
