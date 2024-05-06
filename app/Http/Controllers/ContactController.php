@@ -17,8 +17,8 @@ class ContactController extends Controller
             "status" => "success",
             "code" => 200,
             "contacts" => $contacts
-        );
-        return response()->json([$data], $data['code']);
+        );        
+        return response()->json($data, $data['code']);
     }
 
     public function store(Request $request)
@@ -199,7 +199,7 @@ class ContactController extends Controller
             "contacts" => $contacts
         ];
 
-        return response()->json([$data], $data['code']);
+        return response()->json($data, $data['code']);
     }
 
 }
