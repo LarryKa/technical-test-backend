@@ -256,8 +256,8 @@ class ContactController extends Controller
             });
         }
         
-        $contacts = $query->paginate(10);
-        
+        $contacts = $query->orderByDesc('id')->paginate(10);
+                
         $contacts->load(['phones', 'emails', 'addresses']);
         
         $data = [
